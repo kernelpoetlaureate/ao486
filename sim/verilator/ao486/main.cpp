@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
     
     Vmain *top = new Vmain();
     top->trace (tracer, 99);
-    tracer->rolloverMB(1000000);
+    tracer->rolloverSize(1000000);
     tracer->open("ao486.vcd");
 //tracer->flush();
 //return 0;
@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
     while(!Verilated::gotFinish()) {
         
         //----------------------------------------------------------------------
-        if(top->tb_finish_instr) {
+        if(0) {
             shared_ptr->ao486.instr_counter++;
             
             if(shared_ptr->ao486.stop == STEP_REQ) {
@@ -106,42 +106,42 @@ int main(int argc, char **argv) {
         
         //---------------------------------------------------------------------- sdram
         
-        top->sdram_readdatavalid = 0;
+        top->avm_readdatavalid = 0;
         
-        if(top->sdram_read) {
-            uint32 address = top->sdram_address & 0x07FFFFFC;
+        if(top->avm_read) {
+            uint32 address = top->avm_address & 0x07FFFFFC;
             
             for(uint32 i=0; i<4; i++) {
                 sdram_read_data[i] = shared_ptr->mem.ints[(address + i*4)/4];
             
-                if(((top->sdram_byteenable >> 0) & 1) == 0) sdram_read_data[i] &= 0xFFFFFF00;
-                if(((top->sdram_byteenable >> 1) & 1) == 0) sdram_read_data[i] &= 0xFFFF00FF;
-                if(((top->sdram_byteenable >> 2) & 1) == 0) sdram_read_data[i] &= 0xFF00FFFF;
-                if(((top->sdram_byteenable >> 3) & 1) == 0) sdram_read_data[i] &= 0x00FFFFFF;
+                if(((top->avm_byteenable >> 0) & 1) == 0) sdram_read_data[i] &= 0xFFFFFF00;
+                if(((top->avm_byteenable >> 1) & 1) == 0) sdram_read_data[i] &= 0xFFFF00FF;
+                if(((top->avm_byteenable >> 2) & 1) == 0) sdram_read_data[i] &= 0xFF00FFFF;
+                if(((top->avm_byteenable >> 3) & 1) == 0) sdram_read_data[i] &= 0x00FFFFFF;
             }
-            sdram_read_count = top->sdram_burstcount;
-//printf("sdram read: %08x %x [%08x %08x %08x %08x]\n", address, top->sdram_byteenable, sdram_read_data[0], sdram_read_data[1], sdram_read_data[2], sdram_read_data[3]);
+            sdram_read_count = top->avm_burstcount;
+//printf("sdram read: %08x %x [%08x %08x %08x %08x]\n", address, top->avm_byteenable, sdram_read_data[0], sdram_read_data[1], sdram_read_data[2], sdram_read_data[3]);
         }
         else if(sdram_read_count > 0) {
-            top->sdram_readdatavalid = 1;
-            top->sdram_readdata = sdram_read_data[0];
-//printf("r: %08x\n", top->sdram_readdata);
+            top->avm_readdatavalid = 1;
+            top->avm_readdata = sdram_read_data[0];
+//printf("r: %08x\n", top->avm_readdata);
             memmove(sdram_read_data, &sdram_read_data[1], sizeof(sdram_read_data)-sizeof(uint32));
             sdram_read_count--;
         }
         
-        if(top->sdram_write) {
-            uint32 address = (sdram_write_count > 0)? sdram_write_address : top->sdram_address & 0x07FFFFFC;
-            uint32 data = top->sdram_writedata;
+        if(top->avm_write) {
+            uint32 address = (sdram_write_count > 0)? sdram_write_address : top->avm_address & 0x07FFFFFC;
+            uint32 data = top->avm_writedata;
             
-            if((top->sdram_byteenable & 0x1) == 0) data &= 0xFFFFFF00;
-            if((top->sdram_byteenable & 0x2) == 0) data &= 0xFFFF00FF;
-            if((top->sdram_byteenable & 0x4) == 0) data &= 0xFF00FFFF;
-            if((top->sdram_byteenable & 0x8) == 0) data &= 0x00FFFFFF;
+            if((top->avm_byteenable & 0x1) == 0) data &= 0xFFFFFF00;
+            if((top->avm_byteenable & 0x2) == 0) data &= 0xFFFF00FF;
+            if((top->avm_byteenable & 0x4) == 0) data &= 0xFF00FFFF;
+            if((top->avm_byteenable & 0x8) == 0) data &= 0x00FFFFFF;
             
-printf("sdram write: %08x %x %08x %d", address, top->sdram_byteenable, data, sdram_write_count);
+printf("sdram write: %08x %x %08x %d", address, top->avm_byteenable, data, sdram_write_count);
             shared_ptr->ao486.mem_address    = address;
-            shared_ptr->ao486.mem_byteenable = top->sdram_byteenable;
+            shared_ptr->ao486.mem_byteenable = top->avm_byteenable;
             shared_ptr->ao486.mem_is_write   = 1;
             shared_ptr->ao486.mem_data       = data;
             shared_ptr->ao486.mem_step       = STEP_REQ;
@@ -153,7 +153,7 @@ printf("sdram write: %08x %x %08x %d", address, top->sdram_byteenable, data, sdr
             
             if(sdram_write_count == 0) {
                 sdram_write_address = (address + 4) & 0x07FFFFFC;
-                sdram_write_count = top->sdram_burstcount;
+                sdram_write_count = top->avm_burstcount;
             }
             
             if(sdram_write_count > 0) sdram_write_count--;
@@ -162,13 +162,13 @@ printf("\n");
         
         //---------------------------------------------------------------------- vga
         
-        top->vga_readdatavalid = 0;
+        // 0 = 0;
         
-        if(top->vga_read) {
-            vga_read_address = top->vga_address & 0x000FFFFC;
+        if(0) {
+            vga_read_address = 0 & 0x000FFFFC;
 
-            vga_read_count = top->vga_burstcount;
-            vga_read_byteenable = top->vga_byteenable;
+            vga_read_count = 0;
+            vga_read_byteenable = 0;
 printf("vga read: %08x %x %d\n", vga_read_address, vga_read_byteenable, vga_read_count);
         }
         else if(vga_read_count > 0) {
@@ -183,26 +183,26 @@ printf("vga read: %08x %x %d\n", vga_read_address, vga_read_byteenable, vga_read
             uint32 value = shared_ptr->ao486.mem_data;
             shared_ptr->ao486.mem_step = STEP_IDLE;
             
-            top->vga_readdatavalid = 1;
-            top->vga_readdata = value;
+            // 0 = 1;
+            // 0 = value;
             
             vga_read_address = (vga_read_address + 4) & 0x000FFFFC;
             vga_read_count--;
 printf("\n");
         }
         
-        if(top->vga_write) {
-            uint32 address = (vga_write_count > 0)? vga_write_address : top->vga_address & 0x000FFFFC;
-            uint32 data = top->vga_writedata;
+        if(0) {
+            uint32 address = (vga_write_count > 0)? vga_write_address : 0 & 0x000FFFFC;
+            uint32 data = 0;
             
-            if((top->vga_byteenable & 0x1) == 0) data &= 0xFFFFFF00;
-            if((top->vga_byteenable & 0x2) == 0) data &= 0xFFFF00FF;
-            if((top->vga_byteenable & 0x4) == 0) data &= 0xFF00FFFF;
-            if((top->vga_byteenable & 0x8) == 0) data &= 0x00FFFFFF;
+            if((0 & 0x1) == 0) data &= 0xFFFFFF00;
+            if((0 & 0x2) == 0) data &= 0xFFFF00FF;
+            if((0 & 0x4) == 0) data &= 0xFF00FFFF;
+            if((0 & 0x8) == 0) data &= 0x00FFFFFF;
             
-printf("vga write: %08x %x %08x %d", address, top->sdram_byteenable, data, vga_write_count);
+printf("vga write: %08x %x %08x %d", address, top->avm_byteenable, data, vga_write_count);
             shared_ptr->ao486.mem_address    = address;
-            shared_ptr->ao486.mem_byteenable = top->vga_byteenable;
+            shared_ptr->ao486.mem_byteenable = 0;
             shared_ptr->ao486.mem_is_write   = 1;
             shared_ptr->ao486.mem_data       = data;
             shared_ptr->ao486.mem_step       = STEP_REQ;
@@ -214,7 +214,7 @@ printf("vga write: %08x %x %08x %d", address, top->sdram_byteenable, data, vga_w
             
             if(vga_write_count == 0) {
                 vga_write_address = (address + 4) & 0x07FFFFFC;
-                vga_write_count = top->vga_burstcount;
+                vga_write_count = 0;
             }
             
             if(vga_write_count > 0) vga_write_count--;
