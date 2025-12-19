@@ -13,3 +13,5 @@
 # Temporary files
 *.tmp
 *~
+sim/verilator/ao486/obj_dir/
+*.gch
