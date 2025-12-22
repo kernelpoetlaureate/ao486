@@ -24,6 +24,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
+//implements the address calculation and safety checking required to push something onto the stack
+
 `include "defines.v"
 
 module write_stack(
@@ -64,11 +67,17 @@ module write_stack(
 );
 
 //------------------------------------------------------------------------------ stack
-
+//wr push length is either 2 or 4 bytes. If we are pushing a word -2 , for dword -4.
+//2 byte push at addr 0x100, occupies 0x100 and 0x101. 
+//4 byte push at addr 0x100, occupies 0x100,0x101,0x102,0x103
+//so we must consider the limit for ranges. 
+//entire range must be within limit
 wire [2:0]  wr_push_length_minus_1;
+
 
 assign wr_stack_esp = (ss_cache[`DESC_BIT_D_B])? wr_stack_offset : { esp[31:16], wr_stack_offset[15:0] };
 
+//Takes SP value and adds the stack segment base to produce a linear address
 assign wr_push_linear = ss_base + wr_stack_offset;
 
 assign wr_push_length = (wr_push_length_word || (~(wr_push_length_dword) && wr_operand_16bit))?  3'd2 : 3'd4;

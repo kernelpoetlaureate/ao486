@@ -15,3 +15,5 @@
 *~
 sim/verilator/ao486/obj_dir/
 *.gch
+sim/iverilog/ao486/build.sh
+sim/verilator/soc/soc

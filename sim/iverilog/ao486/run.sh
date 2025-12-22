@@ -3,7 +3,7 @@
 # --- Configuration ---
 TOP_DIR="../../../rtl"
 TB_FILE="simple_test.v"
-ASM_FILE="test.s"
+ASM_FILE="my_simple_test.s"
 OUT_VVP="simple_test.vvp"
 
 echo "========================================"
