@@ -17,3 +17,11 @@ sim/verilator/ao486/obj_dir/
 *.gch
 sim/iverilog/ao486/build.sh
 sim/verilator/soc/soc
+sim/iverilog/ao486/build.sh
+sim/iverilog/ao486/run.sh
+sim/sim_pc/sim_pc
+sim/verilator/ao486/build_verilator.sh
+sim/verilator/ao486/fix_ao486_verilator.sh
+syn/components/ps2/software/exe_bsp/create-this-bsp
+syn/components/vga/software/exe_bsp/create-this-bsp
+syn/soc/firmware/exe_bsp/create-this-bsp

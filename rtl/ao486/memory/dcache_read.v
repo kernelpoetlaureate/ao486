@@ -43,6 +43,10 @@ module dcache_read(
 //------------------------------------------------------------------------------
 
 assign read_from_line =
+
+//our cache line is 128 bits wide, aka 16 bytes.
+//3:0 naming just means that when cpu sends signal like this "01011010 01100110 10110000 0101 1010"
+//the module gonna ignore everything but the last 4 bits, hence the [3:0] naming.
     (address[3:0] == 4'd0)?              line[63:0] :
     (address[3:0] == 4'd1)?              line[71:8] :
     (address[3:0] == 4'd2)?              line[79:16] :
