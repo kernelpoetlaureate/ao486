@@ -26,6 +26,10 @@
 
 `include "defines.v"
 
+
+//By the time we reach this module, we have already selected the correct cache line - 128 bits wide.
+//But most of the time registers are much smaller,plus minimum address granularity is 8 bits. 
+//We have to slice the cache line. 
 module dcache_read(
     
     input [127:0]           line,
@@ -47,6 +51,13 @@ assign read_from_line =
 //our cache line is 128 bits wide, aka 16 bytes.
 //3:0 naming just means that when cpu sends signal like this "01011010 01100110 10110000 0101 1010"
 //the module gonna ignore everything but the last 4 bits, hence the [3:0] naming.
+
+//4'd0 is the base, it says that we need 4 bits of data starting from byte 0
+// the base never changes, but the offset increases so we can select different bytes from the line.
+
+//the cpu wants to read 64bits from an address, the system finds 128 bit line containing that address,
+//if the address ends in 0000, we read bits 63:0 from the line
+//if the address ends in 0100, we read bits 95:32
     (address[3:0] == 4'd0)?              line[63:0] :
     (address[3:0] == 4'd1)?              line[71:8] :
     (address[3:0] == 4'd2)?              line[79:16] :
@@ -56,6 +67,10 @@ assign read_from_line =
     (address[3:0] == 4'd6)?              line[111:48] :
     (address[3:0] == 4'd7)?              line[119:56] :
     (address[3:0] == 4'd8)?              line[127:64] :
+
+//since the address starts very close to the end of 128 bit line
+// we have to avoid falling off
+//whatever bits crosses the boundary, we fill with zeros
     (address[3:0] == 4'd9)?     { 8'd0,  line[127:72] } :
     (address[3:0] == 4'd10)?    { 16'd0, line[127:80] } :
     (address[3:0] == 4'd11)?    { 24'd0, line[127:88] } :
